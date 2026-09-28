@@ -15,3 +15,8 @@ class LectureSerializer(ModelSerializer):
     class Meta:
         model = Lecture
         fields = ['title', 'description', 'professor_name', 'slides']
+
+class LinkSerializer(ModelSerializer):
+    class Meta:
+        model = Link
+        fields = ['url']
