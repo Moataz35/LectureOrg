@@ -8,3 +8,7 @@ class IsAuthenticatedAdmin(BasePermission):
 class IsAuthenticatedProfessor(BasePermission):
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role == Role.PROFESSOR
+
+class IsOwner(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.owner == request.user

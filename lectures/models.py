@@ -2,7 +2,7 @@ from django.db import models
 from authentication.models import CustomUser
 
 def create_lecture_path(instance, name):
-    return f"lectures/lecture1.pptx"
+    return f"lectures/lecture{instance.id}.pptx"
 
 class Course(models.Model):
     name = models.CharField(max_length=100)
