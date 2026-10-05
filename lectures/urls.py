@@ -7,5 +7,7 @@ urlpatterns = [
     path('links/', LinkListCreateView.as_view()),
     path('links/<int:pk>/', LinkEditRetrieveView.as_view()),
     path('lectures/<int:lecture_id>/notes/', NoteListCreateView.as_view()),
-    path('notes/<int:pk>/', NoteRetrieveEditView.as_view())
+    path('notes/<int:pk>/', NoteRetrieveEditView.as_view()),
+    path('courses/<int:course_id>/lectures/', LectureListCreateView.as_view()),
+    path('lectures/<int:pk>/', LectureDetailsDeleteView.as_view())
 ]

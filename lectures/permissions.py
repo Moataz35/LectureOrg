@@ -1,13 +1,9 @@
 from rest_framework.permissions import BasePermission
 from authentication.models import Role
 
-class IsAuthenticatedAdmin(BasePermission):
+class IsAuthenticatedAdminOrProf(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == Role.ADMIN
-    
-class IsAuthenticatedProfessor(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == Role.PROFESSOR
+        return request.user.is_authenticated and request.user.role in (Role.PROFESSOR, Role.ADMIN)
 
 class IsOwner(BasePermission):
     def has_object_permission(self, request, view, obj):

@@ -21,7 +21,7 @@ class CoursesListCreateView(ListCreateAPIView):
 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [IsAuthenticatedAdmin() | IsAuthenticatedProfessor()]
+            return [IsAuthenticatedAdminOrProf()]
         elif self.request.method == 'GET':
             return [IsAuthenticated()]
         return super().get_permissions()
@@ -36,7 +36,7 @@ class CourseEditRetrieveView(RetrieveUpdateDestroyAPIView):
         if self.request.method == 'GET':
             return [IsAuthenticated()]
         if self.request.method in ('PUT', 'PATCH', 'DELETE'):
-            return [IsAuthenticatedAdmin() | IsAuthenticatedProfessor()]
+            return [IsAuthenticatedAdminOrProf()]
         return super().get_permissions()
 #=====================================================================================
 
@@ -50,7 +50,7 @@ class LinkListCreateView(ListCreateAPIView):
         if self.request.method == 'GET':
             return [IsAuthenticated()]
         if self.request.method == 'POST':
-            return [IsAuthenticatedProfessor() | IsAuthenticatedAdmin()]
+            return [IsAuthenticatedAdminOrProf()]
         return super().get_permissions()
 
 class LinkEditRetrieveView(RetrieveUpdateDestroyAPIView):
@@ -63,7 +63,7 @@ class LinkEditRetrieveView(RetrieveUpdateDestroyAPIView):
         if self.request.method == 'GET':
             return [IsAuthenticated()]
         if self.request.method in ('PUT', 'PATCH', 'DELETE'):
-            return [IsAuthenticatedAdmin() | IsAuthenticatedProfessor()]
+            return [IsAuthenticatedAdminOrProf()]
         return super().get_permissions()
 #=====================================================================================
 
@@ -109,9 +109,9 @@ class NoteRetrieveEditView(RetrieveUpdateDestroyAPIView):
 # Operations: CRUD
 # Endpoints: '/courses/<course_id>/lectures/', 'lectures/<lecture_id>/'
 # Permissions: Only the professor and admin can make Create, Update, Delete operations. Students can do Read operations
-class LectureCreateView(APIView):
+class LectureListCreateView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedAdmin | IsAuthenticatedProfessor]
+    permission_classes = [IsAuthenticatedAdminOrProf]
 
     def get(self, request, course_id):
         course = get_object_or_404(Course, id=course_id)
@@ -137,4 +137,4 @@ class LectureCreateView(APIView):
 
 class LectureDetailsDeleteView(RetrieveDestroyAPIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedAdmin | IsAuthenticatedProfessor]
+    permission_classes = [IsAuthenticatedAdminOrProf]
