@@ -72,13 +72,14 @@ class LinkEditRetrieveView(RetrieveUpdateDestroyAPIView):
 # Endpoints: '/lectures/<lecture_id>/notes/', 'lectures/<lecture_id>/notes/<note_id>/'
 # Permissions: Any one can create notes, but the student can only show his notes and the professor notes. 
 # The student can't show/edit/delete another student notes.
-class NoteListView(APIView):
+class NoteListCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, lecture_id):
+        lecture = get_object_or_404(Lecture, id=lecture_id)
         user_id = request.user.id
-        user_notes = Note.objects.filter(user_id_id=user_id, user_id__role=Role.PROFESSOR, lecture_id=lecture_id)
+        user_notes = Note.objects.filter(user_id_id=user_id, user_id__role=Role.PROFESSOR, lecture_id=lecture)
         serializer = NoteSerializer(instance=user_notes, many=True)
         return Response(serializer.data)
 
@@ -91,7 +92,7 @@ class NoteListView(APIView):
             new_note = Note(
                         title= title,
                         content= content,
-                        user_id= request.user.id,
+                        user_id= request.user,
                         lecture_id= lecture
                       )
             new_note.save()
@@ -106,7 +107,7 @@ class NoteRetrieveEditView(RetrieveUpdateDestroyAPIView):
 
 # Lectures
 # Operations: CRUD
-# Endpoints: '/courses/<course_id>/lectures/', '/courses/<course_id>/lectures/<lecture_id>/'
+# Endpoints: '/courses/<course_id>/lectures/', 'lectures/<lecture_id>/'
 # Permissions: Only the professor and admin can make Create, Update, Delete operations. Students can do Read operations
 class LectureCreateView(APIView):
     authentication_classes = [JWTAuthentication]
