@@ -9,10 +9,6 @@ from .models import *
 from .serializers import *
 from .permissions import *
 
-# Courses
-# Operations: CRUD
-# Endpoints: '/courses/', '/courses/<course_id>/'
-# Permissions: Only the professor and admin can make Create, Update, Delete operations. Students can do Read operations
 class CoursesListCreateView(ListCreateAPIView):
     """A view to get all courses details and create new ones with GET and POST Methods"""
     queryset = Course.objects.all()
@@ -67,11 +63,6 @@ class LinkEditRetrieveView(RetrieveUpdateDestroyAPIView):
         return super().get_permissions()
 #=====================================================================================
 
-# Notes
-# Operations: CRUD
-# Endpoints: '/lectures/<lecture_id>/notes/', 'lectures/<lecture_id>/notes/<note_id>/'
-# Permissions: Any one can create notes, but the student can only show his notes and the professor notes. 
-# The student can't show/edit/delete another student notes.
 class NoteListCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -104,11 +95,8 @@ class NoteRetrieveEditView(RetrieveUpdateDestroyAPIView):
     serializer_class = NoteSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsOwner]
+#=====================================================================================
 
-# Lectures
-# Operations: CRUD
-# Endpoints: '/courses/<course_id>/lectures/', 'lectures/<lecture_id>/'
-# Permissions: Only the professor and admin can make Create, Update, Delete operations. Students can do Read operations
 class LectureListCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedAdminOrProf]
@@ -136,5 +124,7 @@ class LectureListCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LectureDetailsDeleteView(RetrieveDestroyAPIView):
+    queryset = Lecture.objects.all()
+    serializer_class = LectureSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedAdminOrProf]
