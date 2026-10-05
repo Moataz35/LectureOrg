@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveAPIView, ListAPIView, UpdateAPIView, DestroyAPIView, CreateAPIView,  RetrieveUpdateDestroyAPIView, RetrieveDestroyAPIView
+from rest_framework.generics import RetrieveAPIView, ListAPIView, DestroyAPIView, CreateAPIView,  RetrieveUpdateDestroyAPIView, RetrieveDestroyAPIView, ListCreateAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -13,40 +13,31 @@ from .permissions import *
 # Operations: CRUD
 # Endpoints: '/courses/', '/courses/<course_id>/'
 # Permissions: Only the professor and admin can make Create, Update, Delete operations. Students can do Read operations
-class CoursesListView(ListAPIView):
-    """A view to get all courses details with GET Method"""
+class CoursesListCreateView(ListCreateAPIView):
+    """A view to get all courses details and create new ones with GET and POST Methods"""
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
 
-class CourseDetailsView(RetrieveAPIView):
-    """A view to get a specific course details with GET Method"""
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticatedAdmin() | IsAuthenticatedProfessor()]
+        elif self.request.method == 'GET':
+            return [IsAuthenticated()]
+        return super().get_permissions()
 
-class CourseUpdateView(UpdateAPIView):
-    """A simple view to update Course details using PUT/PATCH Methods"""
+class CourseEditRetrieveView(RetrieveUpdateDestroyAPIView):
+    """A view to get a specific course details, update a course and delete a course."""
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedAdmin | IsAuthenticatedProfessor]
 
-class CourseDeleteView(DestroyAPIView):
-    """A simple view to delete a Course using DELETE Method"""
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedAdmin | IsAuthenticatedProfessor]
-
-class CourseCreateView(CreateAPIView):
-    """A simple view to create new Courses using POST Methods"""
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedAdmin | IsAuthenticatedProfessor]
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [IsAuthenticated()]
+        if self.request.method in ('PUT', 'PATCH', 'DELETE'):
+            return [IsAuthenticatedAdmin() | IsAuthenticatedProfessor()]
+        return super().get_permissions()
 
 # Links
 # Operations: CRD
@@ -132,11 +123,11 @@ class LectureCreateView(APIView):
             lecture.link_ids.set(links_list)
             lecture.slides = file
             lecture.save()
-
+            # The old serializer doesn't have link_ids and slides fields
             new_serializer = LectureSerializer(lecture)
             return Response(new_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class LectureUpdateDeleteView(RetrieveDestroyAPIView):
+class LectureDetailsDeleteView(RetrieveDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticatedAdmin | IsAuthenticatedProfessor]
