@@ -1,4 +1,4 @@
-from rest_framework.generics import RetrieveAPIView, ListAPIView, DestroyAPIView, CreateAPIView,  RetrieveUpdateDestroyAPIView, RetrieveDestroyAPIView, ListCreateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveDestroyAPIView, ListCreateAPIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -38,28 +38,34 @@ class CourseEditRetrieveView(RetrieveUpdateDestroyAPIView):
         if self.request.method in ('PUT', 'PATCH', 'DELETE'):
             return [IsAuthenticatedAdmin() | IsAuthenticatedProfessor()]
         return super().get_permissions()
+#=====================================================================================
 
-# Links
-# Operations: CRD
-# Endpoints: '/courses/<course_id>/lectures/<lecture_id>/links/', '/courses/<course_id>/lectures/<lecture_id>/links/<link_id>'
-# Permissions: Only the professor and admin can add links
-class LinkListView(ListAPIView):
+class LinkListCreateView(ListCreateAPIView):
+    """A class view to create a new link, and get all available links"""
     queryset = Link.objects.all()
     serializer_class = LinkSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedProfessor | IsAuthenticatedAdmin]
 
-class LinkDetailsView(RetrieveAPIView):
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [IsAuthenticated()]
+        if self.request.method == 'POST':
+            return [IsAuthenticatedProfessor() | IsAuthenticatedAdmin()]
+        return super().get_permissions()
+
+class LinkEditRetrieveView(RetrieveUpdateDestroyAPIView):
+    """A class view to get a link details, update/delete a link"""
     queryset = Link.objects.all()
     serializer_class = LinkSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
 
-class LinkDeleteView(DestroyAPIView):
-    queryset = Link.objects.all()
-    serializer_class = LinkSerializer
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedProfessor | IsAuthenticatedAdmin]
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [IsAuthenticated()]
+        if self.request.method in ('PUT', 'PATCH', 'DELETE'):
+            return [IsAuthenticatedAdmin() | IsAuthenticatedProfessor()]
+        return super().get_permissions()
+#=====================================================================================
 
 # Notes
 # Operations: CRUD
