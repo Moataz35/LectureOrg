@@ -69,9 +69,12 @@ class NoteListCreateView(APIView):
 
     def get(self, request, lecture_id):
         lecture = get_object_or_404(Lecture, id=lecture_id)
-        user_id = request.user.id
-        user_notes = Note.objects.filter(user_id_id=user_id, user_id__role=Role.PROFESSOR, lecture_id=lecture)
-        serializer = NoteSerializer(instance=user_notes, many=True)
+        user = request.user
+        professor_notes = Note.objects.filter(user_id__role=Role.PROFESSOR, lecture_id=lecture)
+        student_notes = Note.objects.filter(user_id=user, lecture_id=lecture)
+
+        all_notes = student_notes.union(professor_notes)
+        serializer = NoteSerializer(instance=all_notes, many=True)
         return Response(serializer.data)
 
     def post(self, request, lecture_id):
@@ -123,7 +126,7 @@ class LectureListCreateView(APIView):
             return Response(new_serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class LectureDetailsDeleteView(RetrieveDestroyAPIView):
+class LectureDetailsDeleteView(RetrieveUpdateDestroyAPIView):
     queryset = Lecture.objects.all()
     serializer_class = LectureSerializer
     authentication_classes = [JWTAuthentication]
