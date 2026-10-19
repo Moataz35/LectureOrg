@@ -33,9 +33,8 @@ The `Student` can get the details of a specific course/lecture, but he can't edi
 Open you terminal and write these commands:
 
 ```
-> git clone https://github.com/Backend-Committee/Backend-Workshop-Final-Projects.git
-> cd Backend-Workshop-Final-Projects
-> git switch moataz-mohamed
+> git clone https://github.com/Moataz35/LectureOrg.git
+> cd LectureOrg
 ```
 If you don't have `uv` install it from [here](https://docs.astral.sh/uv/getting-started/installation/)
 
